@@ -112,6 +112,7 @@ const logo=document.getElementById("logo");
 const ADMIN_PASSWORD="kincit2501";
 let logoTap=0,lang="id",index=0;
 let usernameSaved="",userIdSaved="";
+let resultShown=false;
 
 let score={gryffindor:0,slytherin:0,hufflepuff:0,ravenclaw:0};
 
@@ -211,11 +212,37 @@ function startIntro(){
 }
 
 function startQuiz(){
-  if(!username.value||!userid.value){errorText.style.display="block";return;}
+
+  if(!username.value||!userid.value){
+    errorText.style.display="block";
+    return;
+  }
+
+  const idPattern = /^HW-26-00-(\d{4})$/;
+
+  if(!idPattern.test(userid.value)){
+    errorText.innerText="ID TIDAK VALID";
+    errorText.style.display="block";
+    return;
+  }
+
+  const nomor=parseInt(userid.value.split("-")[3]);
+
+  if(nomor<1 || nomor>1000){
+    errorText.innerText="Nomor hanya boleh 0001 - 1000";
+    errorText.style.display="block";
+    return;
+  }
+
   usernameSaved=username.value;
   userIdSaved=userid.value;
   errorText.style.display="none";
-  transition(()=>{user.style.display="none";quiz.style.display="block";loadQuestion();});
+
+  transition(()=>{
+    user.style.display="none";
+    quiz.style.display="block";
+    loadQuestion();
+  });
 }
 
 function loadQuestion(){
@@ -232,10 +259,19 @@ function loadQuestion(){
 }
 
 function showResult(){
-  transition(()=>{
-    const house=Object.keys(score).reduce((a,b)=>score[a]>score[b]?a:b);
-    bgMusic.pause();
-    houseMusic.src=house+".aac";
+
+    if(resultShown) retirm;
+    resultShown=true;
+
+    transition(()=>{
+      const house=Object.keys(score).reduce((a,b)=>score[a]>score[b]?a:b);
+
+      bgMusic.pause();
+
+    houseMusic.pause();
+    houseMusic.currentTime = 0;
+    houseMusic.src=house+".aac"; 
+    houseMusic.load();
     houseMusic.play();
 
     const data=JSON.parse(localStorage.getItem("hogwartsPlayers")||"[]");
